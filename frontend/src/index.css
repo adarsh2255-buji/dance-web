@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* Reset default margins and padding */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure the root element takes full width */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
