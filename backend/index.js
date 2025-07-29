@@ -11,51 +11,29 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS configuration for production
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    const allowedOrigins = process.env.NODE_ENV === 'production' 
-      ? [process.env.FRONTEND_URL || 'https://dance-web-pink.vercel.app']
-      : ['http://localhost:3000', 'http://localhost:5173'];
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
-
-// Middleware
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Temporary CORS fix to ensure headers are set
+// CORS configuration - more aggressive approach
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
-  
-  res.header('Access-Control-Allow-Origin', 'https://dance-web-pink.vercel.app');
+  // Allow all origins temporarily for debugging
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
   
+  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+  
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling OPTIONS preflight request');
-    res.sendStatus(200);
-  } else {
-    next();
+    res.status(200).end();
+    return;
   }
+  
+  next();
 });
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 connectDB();
@@ -71,7 +49,14 @@ app.get('/', (req, res) => {
 
 // Test CORS route
 app.get('/api/test', (req, res) => {
+  console.log('Test endpoint hit');
   res.json({ message: 'CORS is working!', timestamp: new Date().toISOString() });
+});
+
+// Test POST route
+app.post('/api/test', (req, res) => {
+  console.log('Test POST endpoint hit');
+  res.json({ message: 'POST CORS is working!', timestamp: new Date().toISOString() });
 });
 
 // Start server
