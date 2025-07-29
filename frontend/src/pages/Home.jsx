@@ -28,12 +28,14 @@ const Home = ({ danceStyleRef, levelRef, reviewsRef, isLoggedIn, onRequireSignup
           <p className="text-base sm:text-lg md:text-2xl text-white mb-8 drop-shadow-[0_4px_12px_rgba(0,0,0,1)] px-2">
             Learn from the best, anytime, anywhere.
           </p>
-          <Link
-            to="/signup"
-            className="px-6 py-3 md:px-8 md:py-4 bg-black text-white rounded-lg text-base md:text-lg font-semibold shadow-lg hover:bg-gray-800 transition"
-          >
-            Start Now
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              to="/signup"
+              className="px-6 py-3 md:px-8 md:py-4 bg-black text-white rounded-lg text-base md:text-lg font-semibold shadow-lg hover:bg-gray-800 transition"
+            >
+              Start Now
+            </Link>
+          )}
         </div>
       </section>
       <div ref={danceStyleRef}>

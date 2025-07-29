@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import DanceStyleVideos from './pages/DanceStyleVideos'
+import Courses from './pages/Courses'
 
 const App = () => {
   // Refs for scrolling
@@ -16,9 +17,21 @@ const App = () => {
   // Auth state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Check for existing token on app load
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   // Login/Logout handlers
   const handleLogin = () => setIsLoggedIn(true);
-  const handleLogout = () => setIsLoggedIn(false);
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
 
   // Scroll handlers
   const handleScrollToStyles = () => {
@@ -45,6 +58,7 @@ const App = () => {
         onScrollToReviews={handleScrollToReviews}
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
+        onLogin={handleLogin}
       />
       <main className="py-8">
         <Routes>
@@ -63,6 +77,7 @@ const App = () => {
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onSignup={handleLogin} />} />
           <Route path="/styles/:style" element={<DanceStyleVideos isLoggedIn={isLoggedIn} />} />
+          <Route path="/courses" element={<Courses />} />
         </Routes>
       </main>
       <Footer />

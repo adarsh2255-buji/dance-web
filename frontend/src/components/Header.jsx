@@ -1,9 +1,28 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const Header = ({ onScrollToStyles, onScrollToLevels, onScrollToReviews, isLoggedIn, onLogout }) => {
+const Header = ({ onScrollToStyles, onScrollToLevels, onScrollToReviews, isLoggedIn, onLogout, onLogin }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    onLogout();
+    navigate('/login');
+  };
+
+  const handleLogin = () => {
+    // If we're not already on the login page, navigate to it
+    if (location.pathname !== '/login') {
+      navigate('/login');
+    }
+    // If onLogin function is provided, call it
+    if (onLogin) {
+      onLogin();
+    }
+  };
 
   return (
     <header className="bg-white text-black p-0 w-full shadow-sm">
@@ -37,15 +56,24 @@ const Header = ({ onScrollToStyles, onScrollToLevels, onScrollToReviews, isLogge
                 <Link to="/" className="hover:underline">Reviews</Link>
               )}
             </li>
+            {isLoggedIn && (
+              <li>
+                <Link to="/courses" className="hover:underline">Courses</Link>
+              </li>
+            )}
           </ul>
           <ul className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 items-center w-full md:w-auto">
             {isLoggedIn ? (
               <li>
-                <button onClick={onLogout} className="ml-0 md:ml-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-semibold transition w-full md:w-auto">Logout</button>
+                <button onClick={handleLogout} className="ml-0 md:ml-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-semibold transition w-full md:w-auto">Logout</button>
               </li>
             ) : (
               <>
-                <li><Link to="/login" className="hover:underline">Login</Link></li>
+                <li>
+                  <button onClick={handleLogin} className="hover:underline bg-transparent border-none cursor-pointer p-0 m-0">
+                    Login
+                  </button>
+                </li>
                 <li>
                   <Link to="/signup" className="ml-0 md:ml-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-semibold transition w-full md:w-auto">Signup</Link>
                 </li>

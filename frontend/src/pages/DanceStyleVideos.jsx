@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useLocation } from "react-router-dom";
 
 const demoVideos = {
   "hip-hop": [
@@ -54,20 +54,29 @@ const demoVideos = {
 
 const DanceStyleVideos = ({ isLoggedIn }) => {
   const { style } = useParams();
+  const location = useLocation();
+  const course = location.state?.course;
 
   if (!isLoggedIn) {
     return <Navigate to="/signup" replace />;
   }
 
-  const videos = demoVideos[style] || [];
+  // If we have course data from navigation, use it; otherwise fall back to demo videos
+  const videos = course?.courseVideos || demoVideos[style] || [];
+  const courseName = course?.courseName || style.replace(/-/g, ' ');
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50 py-16 px-2 sm:px-4">
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-purple-700 capitalize text-center">
-        {style.replace(/-/g, ' ')} Dance Videos
+        {courseName} Videos
       </h1>
       {videos.length === 0 ? (
-        <p className="text-lg text-gray-700 mb-8 text-center">No demo videos available for this style.</p>
+        <div className="text-center">
+          <p className="text-lg text-gray-700 mb-8">No videos available for this course.</p>
+          {course && (
+            <p className="text-sm text-gray-500">This course doesn't have any videos yet.</p>
+          )}
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 w-full max-w-5xl">
           {videos.map((video, idx) => (
@@ -78,12 +87,24 @@ const DanceStyleVideos = ({ isLoggedIn }) => {
               rel="noopener noreferrer"
               className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col"
             >
-              <img src={video.thumbnail} alt={video.title} className="w-full h-40 sm:h-56 object-cover" />
+              <img 
+                src={video.thumbnail || "https://img.youtube.com/vi/default/hqdefault.jpg"} 
+                alt={video.title} 
+                className="w-full h-40 sm:h-56 object-cover" 
+              />
               <div className="p-3 md:p-4 flex-1 flex items-center justify-center">
                 <h2 className="text-base md:text-lg font-semibold text-gray-800 text-center">{video.title}</h2>
               </div>
             </a>
           ))}
+        </div>
+      )}
+      
+      {course && (
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-600">
+            Course created: {new Date(course.createdAt).toLocaleDateString()}
+          </p>
         </div>
       )}
     </div>

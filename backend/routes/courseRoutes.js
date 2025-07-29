@@ -8,8 +8,12 @@ import {
   addVideoToCourse,
   removeVideoFromCourse
 } from '../controller/courseController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Protect all course routes
+router.use(protect);
 
 // Course routes
 router.post('/', createCourse);

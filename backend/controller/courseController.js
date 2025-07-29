@@ -43,11 +43,11 @@ export const getCourseById = async (req, res) => {
 // Update a course
 export const updateCourse = async (req, res) => {
   try {
-    const { courseName, courseVideos } = req.body;
+    const { courseName, thumbnail, courseVideos } = req.body;
     
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
-      { courseName, courseVideos },
+      { courseName, thumbnail,  courseVideos },
       { new: true, runValidators: true }
     );
     
@@ -79,14 +79,14 @@ export const deleteCourse = async (req, res) => {
 // Add a video to a course
 export const addVideoToCourse = async (req, res) => {
   try {
-    const { title, url } = req.body;
+    const { title, url, thumbnail } = req.body;
     
     const course = await Course.findById(req.params.id);
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
     
-    course.courseVideos.push({ title, url });
+    course.courseVideos.push({ title, url, thumbnail });
     const updatedCourse = await course.save();
     
     res.status(200).json(updatedCourse);
